@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.gabrieljimenez.houndifystt"
+        minSdkVersion 16
+        targetSdkVersion 24
+        versionCode 16
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+    }
+}
+
+repositories {
+    maven {
+        url 'https://houndify.com/maven/'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    testCompile 'junit:junit:4.12'
+
+  	if (project.hasProperty('USE_LOCAL_HOUND_PROJECTS') && USE_LOCAL_HOUND_PROJECTS == "true") {
+          // For SoundHound internal use, use standard include method below
+          compile project(':houndify_sdk_libraries:hound_sdk')
+      }
+      else {
+          //** Standard method for including hound-sdk into a project
+          compile('hound.android:hound-sdk:' + '0.2.21' + '@aar') {
+              transitive = true
+          }
+      }
+      // Include the phrase spotter
+      compile('hound.android:phrasespotter:1.6.0') {
+          transitive = true
+      }
+      
+}
