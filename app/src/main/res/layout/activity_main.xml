@@ -16,14 +16,20 @@
             android:layout_height="wrap_content"
             android:text="Ready." android:layout_alignParentTop="true" android:layout_centerHorizontal="true"
             android:id="@+id/statusTextView"/>
-    <Button
-            android:text="Start Recording"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="38dp" android:id="@+id/Recordbutton" android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"/>
     <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent" android:layout_below="@+id/Recordbutton"
             android:layout_centerHorizontal="true" android:layout_marginTop="43dp" android:id="@+id/resultList"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_below="@+id/Recordbutton"
+            android:layout_centerHorizontal="true" android:layout_marginTop="17dp" android:id="@+id/selectedText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" android:textSize="24sp"
+    />
+    <Button
+            android:text="Start Recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp" android:id="@+id/Recordbutton"
+            android:layout_below="@+id/statusTextView" android:layout_centerHorizontal="true"/>
 </RelativeLayout>

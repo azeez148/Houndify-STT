@@ -9,12 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 
-import android.widget.Toast;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hound.android.sdk.VoiceSearch;
 import com.hound.android.sdk.VoiceSearchInfo;
@@ -26,11 +23,13 @@ import com.hound.core.model.sdk.HoundRequestInfo;
 import com.hound.core.model.sdk.HoundResponse;
 import com.hound.core.model.sdk.PartialTranscript;
 import com.hound.core.model.sdk.Disambiguation;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button recordButton;
     private TextView statusTextView;
     private ListView resultList;
+    private TextView selectedText;
 
     private VoiceSearch voiceSearch;
     private LocationManager locationManager;
@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
 
         recordButton = (Button)findViewById(R.id.Recordbutton);
         statusTextView = (TextView)findViewById(R.id.statusTextView);
+        resultList = (ListView)findViewById(R.id.resultList);
+        selectedText = (TextView)findViewById(R.id.selectedText);
+
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         /** Setup a click listener for the search button to trigger the Voice Search */
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         final HoundRequestInfo requestInfo = HoundRequestInfoFactory.getDefault(this);
 
         // Client App is responsible for providing a UserId for their users which is meaningful to the client.
-        requestInfo.setUserId("ID1");
+        requestInfo.setUserId("ID2");
         // Each request must provide a unique request ID.
         requestInfo.setRequestId(UUID.randomUUID().toString());
         // Providing the user's location is useful for geographic queries, such as, "Show me restaurants near me".
@@ -139,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
     private void resetUIState() {
         recordButton.setEnabled(true);
         recordButton.setText("Start Recording");
+        selectedText.setText("");
+        resultList.setAdapter(null);
+
     }
 
     /**
@@ -161,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 .setListener( voiceListener )
                 .build();
 
+        //System.out.println(voiceSearch.toString());
 
         statusTextView.setText("Listening...");
         // Toggle the text on our search button to indicate pressing it now will abort the search.
@@ -223,27 +231,37 @@ public class MainActivity extends AppCompatActivity {
                     //System.out.println(response.getResults().toString());
                 }
 
-                statusTextView.setText("Received response...displaying the JSON");
+                statusTextView.setText("Received response...displaying the result");
 
                 // We put pretty printing JSON on a separate thread as the server JSON can be quite large and will stutter the UI
 
-                    // Not meant to be configuration change proof, this is just a demo
+                // Not meant to be configuration change proof, this is just a demo
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        JSONObject jsonResponse;
                         String message;
                         try {
                             message = "Response\n\n" + new JSONObject(info.getContentBody()).toString(4);
-                            System.out.print(message);
+                            //System.out.print(message);
+                            //System.out.println(voiceSearch.toString());
+                            jsonResponse = new JSONObject(info.getContentBody());
                         } catch (final JSONException ex) {
                             statusTextView.setText("Bad JSON\n\n" + response);
                             message = "Bad JSON\n\n" + response;
+                            jsonResponse = new JSONObject();
                         }
                         final String finalMessage = message;
+                        final JSONObject finalJson = jsonResponse;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                statusTextView.setText(finalMessage);
+                                //statusTextView.setText(finalMessage);
+                                try {
+                                    showResponseFromHoundService(finalJson);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -311,8 +329,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showResponseFromHoundService(JSONObject response){
+    private void showResponseFromHoundService(JSONObject response) throws JSONException {
 
+        JSONArray jsonResultsArr = response.getJSONArray("AllResults");
+        final ArrayList<String> finalResultList = new ArrayList<String>();
+        for(int i=0;i<jsonResultsArr.length();i++){
+            JSONObject gg = (JSONObject) jsonResultsArr.get(i);
+            finalResultList.add(gg.getString("WrittenResponse"));
+        }
+        //System.out.println(finalResultList.toString());
+        selectedText.setText("Select match text");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,finalResultList);
+        resultList.setAdapter(adapter);
+        resultList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedText.setText("You have said "+finalResultList.get(i));
+            }
+        });
     }
 
 }
