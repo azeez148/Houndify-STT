@@ -35,11 +35,13 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    // UI Components
     private Button recordButton;
     private TextView statusTextView;
     private ListView resultList;
     private TextView selectedText;
 
+    // Miscellaneous Components
     private VoiceSearch voiceSearch;
     private LocationManager locationManager;
     private JsonNode lastConversationState;
@@ -50,18 +52,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize UI Components
         recordButton = (Button)findViewById(R.id.Recordbutton);
         statusTextView = (TextView)findViewById(R.id.statusTextView);
         resultList = (ListView)findViewById(R.id.resultList);
         selectedText = (TextView)findViewById(R.id.selectedText);
 
-
+        // Initialize Miscellaneous Components
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        /** Setup a click listener for the search button to trigger the Voice Search */
+        /** Setup a click listener for the record button to trigger the Voice Search */
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
+
+                //If you have internet, wifi or cellular data connection.
                 if(isConnected()){
                     // No VoiceSearch is active, start one.
                     if ( voiceSearch == null ) {
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }else {
+                    // Display user message to conect to internet
                     Toast.makeText(getApplicationContext(), "Plese Connect to Internet", Toast.LENGTH_LONG).show();
                 }
 
@@ -87,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * Helper method called from the record button on click listener, for check if user has intenet access
+     * @return true if have internet access or false if don't
+     */
 
     public  boolean isConnected()
     {
@@ -119,9 +130,10 @@ public class MainActivity extends AppCompatActivity {
         // searches may return us a conversation state to use.  Add it to the request info when we have one.
         requestInfo.setConversationState( lastConversationState );
 
+        // set maximum results to show
         requestInfo.setMaxResults(10);
+        // set minimun results to show
         requestInfo.setMinResults(5);
-        //requestInfo.setClientMatchesOnly(false);
 
         return requestInfo;
     }
@@ -140,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Helper function for reset UI components
+     */
     private void resetUIState() {
         recordButton.setEnabled(true);
         recordButton.setText("Start Recording");
@@ -168,10 +183,8 @@ public class MainActivity extends AppCompatActivity {
                 .setListener( voiceListener )
                 .build();
 
-        //System.out.println(voiceSearch.toString());
-
         statusTextView.setText("Listening...");
-        // Toggle the text on our search button to indicate pressing it now will abort the search.
+        // Toggle the text on our record button to indicate pressing it now will abort the search.
         recordButton.setText("Stop Recording");
 
         // Kickoff the search. This will start listening from the microphone and streaming
@@ -225,10 +238,6 @@ public class MainActivity extends AppCompatActivity {
                     // may contain more than one item. For now it does not, so just grab the first result's
                     // conversation state and use it.
                     lastConversationState = response.getResults().get(0).getConversationState();
-                    //
-                    //response.setNumToReturn(10);
-                    //System.out.println(response.getNumToReturn());
-                    //System.out.println(response.getResults().toString());
                 }
 
                 statusTextView.setText("Received response...displaying the result");
@@ -240,24 +249,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         JSONObject jsonResponse;
-                        String message;
                         try {
-                            message = "Response\n\n" + new JSONObject(info.getContentBody()).toString(4);
-                            //System.out.print(message);
-                            //System.out.println(voiceSearch.toString());
                             jsonResponse = new JSONObject(info.getContentBody());
                         } catch (final JSONException ex) {
                             statusTextView.setText("Bad JSON\n\n" + response);
-                            message = "Bad JSON\n\n" + response;
                             jsonResponse = new JSONObject();
                         }
-                        final String finalMessage = message;
                         final JSONObject finalJson = jsonResponse;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //statusTextView.setText(finalMessage);
                                 try {
+                                    // Will show the result in the UI List View
                                     showResponseFromHoundService(finalJson);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -329,6 +332,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method used to show up the result in the List View
+     * @param response response from the server
+     * @throws JSONException
+     */
     private void showResponseFromHoundService(JSONObject response) throws JSONException {
 
         JSONArray jsonResultsArr = response.getJSONArray("AllResults");
@@ -337,7 +345,6 @@ public class MainActivity extends AppCompatActivity {
             JSONObject gg = (JSONObject) jsonResultsArr.get(i);
             finalResultList.add(gg.getString("WrittenResponse"));
         }
-        //System.out.println(finalResultList.toString());
         selectedText.setText("Select match text");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,finalResultList);
         resultList.setAdapter(adapter);
