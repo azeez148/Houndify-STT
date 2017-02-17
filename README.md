@@ -21,3 +21,5 @@ Hounify API only supports the English language for the moment check this link fo
 -[General Houndify API Reference](https://docs.houndify.com/reference)
 
 -[Houndify Android API Reference](http://static.houndify.com/sdks/android/v0.2.21/javadoc/)
+
+-[Start the project from the scratch (guide)](https://goo.gl/xq0MzQ)
