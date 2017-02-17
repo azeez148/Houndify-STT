@@ -22,7 +22,6 @@ import com.hound.android.sdk.util.HoundRequestInfoFactory;
 import com.hound.core.model.sdk.HoundRequestInfo;
 import com.hound.core.model.sdk.HoundResponse;
 import com.hound.core.model.sdk.PartialTranscript;
-import com.hound.core.model.sdk.Disambiguation;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +29,6 @@ import org.json.JSONObject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Helper function for filling the user's location info into the query.
+     * Helper method for filling the user's location info into the query.
      *
      * @param requestInfo
      * @param location
@@ -153,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Helper function for reset UI components
+     * Helper method for reset UI components
      */
     private void resetUIState() {
         recordButton.setEnabled(true);
@@ -170,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         if (voiceSearch != null) {
             return; // We are already searching
         }
-
         /**
          * Example of using the VoiceSearch.Builder to configure a VoiceSearch object
          * which is then use to run the voice search.
@@ -198,7 +195,6 @@ public class MainActivity extends AppCompatActivity {
      * and the final search results.
      */
     private final VoiceSearchListener voiceListener = new VoiceSearchListener() {
-
         /**
          * Called every time a new partial transcription is received from the Hound server.
          * This is used for providing feedback to the user of the server's interpretation of their query.
@@ -209,27 +205,23 @@ public class MainActivity extends AppCompatActivity {
         public void onTranscriptionUpdate(final PartialTranscript transcript) {
             final StringBuilder str = new StringBuilder();
             switch (voiceSearch.getState()) {
-                case STATE_STARTED:
-                    str.append("Listening...");
-                    break;
-                case STATE_SEARCHING:
-                    str.append("Receiving...");
-                    break;
-                default:
-                    str.append("Unknown");
-                    break;
+                case STATE_STARTED:str.append("Listening...");break;
+                case STATE_SEARCHING:str.append("Receiving...");break;
+                default:str.append("Unknown");break;
             }
-            str.append("\n\n");
-            str.append(transcript.getPartialTranscript());
-
+            str.append("\n\n");str.append(transcript.getPartialTranscript());
             statusTextView.setText(str.toString());
         }
 
+        /**
+         * Called when the Hound Server fully response
+         * @param response
+         * @param info
+         */
         @Override
         public void onResponse(final HoundResponse response,  final VoiceSearchInfo info) {
             voiceSearch = null;
             resetUIState();
-
             // Make sure the request succeeded with OK
             if ( response.getStatus().equals( HoundResponse.Status.OK ) ) {
                 if (!response.getResults().isEmpty()) {
@@ -239,11 +231,8 @@ public class MainActivity extends AppCompatActivity {
                     // conversation state and use it.
                     lastConversationState = response.getResults().get(0).getConversationState();
                 }
-
                 statusTextView.setText("Received response...displaying the result");
-
                 // We put pretty printing JSON on a separate thread as the server JSON can be quite large and will stutter the UI
-
                 // Not meant to be configuration change proof, this is just a demo
                 new Thread(new Runnable() {
                     @Override
@@ -275,8 +264,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-
-
         /**
          * Called if the search fails do to some kind of error situation.
          *
@@ -289,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
             resetUIState();
             statusTextView.setText(exceptionToString(ex));
         }
-
         /**
          * Called when the recording phase is completed.
          */
@@ -298,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
             recordButton.setText("Receiving");
             statusTextView.setText("Receiving...");
         }
-
         /**
          * Called if the user aborted the search.
          *
