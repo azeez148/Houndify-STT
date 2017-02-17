@@ -1,5 +1,7 @@
 # Houndify-STT
 
+Basic project the android using the Houndify API for Speech to Text
+
 #Requirements
 
 -[Houndify API Access](https://www.houndify.com/signup)
