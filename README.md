@@ -3,6 +3,7 @@
 #Requirements
 
 -Houndify API Access
+
 -Houndify Android SDK
 -Android Studio or Intellij IDEA
 -Android API 16 or higher
