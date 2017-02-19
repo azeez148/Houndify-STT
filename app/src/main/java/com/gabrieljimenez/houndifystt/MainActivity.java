@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
      * @return true if have internet access or false if don't
      */
 
-    public  boolean isConnected()
+    private boolean isConnected()
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo net = cm.getActiveNetworkInfo();
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
      * @param requestInfo
      * @param location
      */
-    public static void setLocation(final HoundRequestInfo requestInfo, final Location location) {
+    private static void setLocation(final HoundRequestInfo requestInfo, final Location location) {
         if (location != null) {
             requestInfo.setLatitude(location.getLatitude());
             requestInfo.setLongitude(location.getLongitude());
