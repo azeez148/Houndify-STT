@@ -14,12 +14,14 @@ Basic Android project using the Houndify API for Speech to Text
 
 -Physical Android Device with API 16 or higher
 
+-Internet Access
+
 Note:
 Hounify API only supports the English language for the moment check this link for [updates](https://www.houndify.com/faq).
 
 #Reference
--[General Houndify API Reference](https://docs.houndify.com/reference)
+- [General Houndify API Reference](https://docs.houndify.com/reference)
 
--[Houndify Android API Reference](http://static.houndify.com/sdks/android/v0.2.21/javadoc/)
+- [Houndify Android API Reference](http://static.houndify.com/sdks/android/v0.2.21/javadoc/)
 
--[Start the project from the scratch (guide)](https://goo.gl/xq0MzQ)
+- Start the project from the scratch [guide](https://goo.gl/xq0MzQ)
